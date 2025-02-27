@@ -3,8 +3,8 @@ name: Deploy Code
 on:
   push:
     branches:
-      - main
-      - develop
+      - 'main'
+      - 'develop'
 
 jobs:
   main-job:
@@ -31,6 +31,8 @@ jobs:
     if: github.ref_name == 'develop'
     runs-on: ubuntu-latest
     steps:
+      - name: Hello world
+        run: echo "Hello World. This is inside the develop branch"
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Zip code
