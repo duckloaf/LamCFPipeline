@@ -19,19 +19,71 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Zip code
+        
+      - name: Read Index file content
+        id: read_index
         run: |
-          zip -r deployment.zip . -x ".git/*" ".github/*"
-      - name: Deploy to endpoint
+          INDEX_CONTENT=$(cat index.mjs)
+          echo "index_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$INDEX_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Read Readme file content
+        id: read_readme
+        run: |
+          README_CONTENT=$(cat index.mjs)
+          echo "readme_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$README_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send File contents to endpoint as JSON
         run: |
           curl -X POST \
-            -F "file=@deployment.zip" \
-            -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\", \"readmeContent\": \"${{ steps.read_readme.outputs.readme_content }}\"}" \
             https://qeswu1v32f.execute-api.ap-southeast-2.amazonaws.com/pipeline/deploy/prod
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed!"
-            exit 1
-          fi
+
+  dev-job:
+    if: github.ref_name == 'bullshit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Read Index file content
+        id: read_index
+        run: |
+          INDEX_CONTENT=$(cat index.mjs)
+          echo "index_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$INDEX_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Read Readme file content
+        id: read_readme
+        run: |
+          README_CONTENT=$(cat index.mjs)
+          echo "readme_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$README_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send File contents to endpoint as JSON
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\", \"readmeContent\": \"${{ steps.read_readme.outputs.readme_content }}\"}" \
+            https://qeswu1v32f.execute-api.ap-southeast-2.amazonaws.com/pipeline/deploy/uat
+      
+      # - name: Zip code
+      #   run: |
+      #     zip -r deployment.zip . -x ".git/*" ".github/*"
+      # - name: Deploy to endpoint
+      #   run: |
+      #     curl -X POST \
+      #       -F "file=@deployment.zip" \
+      #       -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+      #       https://qeswu1v32f.execute-api.ap-southeast-2.amazonaws.com/pipeline/deploy/prod
+      #     if [ $? -ne 0 ]; then
+      #       echo "Deployment failed!"
+      #       exit 1
+      #     fi
 
   common-job:
     runs-on: ubuntu-latest
