@@ -21,4 +21,9 @@ jobs:
         run: |
           curl -X POST \
             -F "file=@deployment.zip" \
+            -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
             https://qeswu1v32f.execute-api.ap-southeast-2.amazonaws.com/pipeline/deploy/uat
+          if [ $? -ne 0 ]; then
+            echo "Deployment failed!"
+            exit 1
+          fi
