@@ -1,0 +1,29 @@
+name: Deploy Code
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Zip code
+        run: |
+          zip -r deployment.zip . -x ".git/*" ".github/*"
+
+      - name: Deploy to endpoint
+        run: |
+          curl -X POST \
+            -F "file=@deployment.zip" \
+            -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+            https://qeswu1v32f.execute-api.ap-southeast-2.amazonaws.com/pipeline/deploy/prod
+          if [ $? -ne 0 ]; then
+            echo "Deployment failed!"
+            exit 1
+          fi
