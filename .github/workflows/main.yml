@@ -10,15 +10,12 @@ jobs:
   main-job:
     if: github.ref_name == 'main'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Zip code
         run: |
           zip -r deployment.zip . -x ".git/*" ".github/*"
-
       - name: Deploy to endpoint
         run: |
           curl -X POST \
@@ -33,15 +30,12 @@ jobs:
   develop-job:
     if: github.ref_name == 'develop'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Zip code
         run: |
           zip -r deployment.zip . -x ".git/*" ".github/*"
-
       - name: Deploy to endpoint
         run: |
           curl -X POST \
