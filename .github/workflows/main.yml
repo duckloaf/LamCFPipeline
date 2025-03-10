@@ -56,24 +56,33 @@ jobs:
     #       echo "index_content<<EOF" >> $GITHUB_OUTPUT
     #       echo "$INDEX_CONTENT" >> $GITHUB_OUTPUT
     #       echo "EOF" >> $GITHUB_OUTPUT
+      - name: Zip code
+        run: |
+           zip -r deployment.zip . -x ".git/*" ".github/*" "*.zip"
 
-      - name: Send File contents to endpoint as JSON    
-      # - name: Zip code
-        run: |
-          zip -r deployment.zip . -x ".git/*" ".github/*"
-      - name: Deploy to endpoint
-        run: |
-          curl -X POST \
-            --data-binary "@deployment.zip" \
-            -H "Content-Type: application/octet-stream" \
-            -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
-            -H "Branch: ${{ github.ref_name }}" \
-            -H "Repository: ${{ github.repository }}" \
-            https://jsf58ekjw3.execute-api.us-west-2.amazonaws.com/prod/deploy
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed!"
-            exit 1
-          fi
+      - name: Commit and push zip file
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+            commit_message: "Add deployment.zip"
+            file_pattern: deployment.zip
+
+    #   - name: Send File contents to endpoint as JSON    
+    #   # - name: Zip code
+    #     run: |
+    #       zip -r deployment.zip . -x ".git/*" ".github/*"
+    #   - name: Deploy to endpoint
+    #     run: |
+    #       curl -X POST \
+    #         --data-binary "@deployment.zip" \
+    #         -H "Content-Type: application/octet-stream" \
+    #         -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+    #         -H "Branch: ${{ github.ref_name }}" \
+    #         -H "Repository: ${{ github.repository }}" \
+    #         https://jsf58ekjw3.execute-api.us-west-2.amazonaws.com/prod/deploy
+    #       if [ $? -ne 0 ]; then
+    #         echo "Deployment failed!"
+    #         exit 1
+    #       fi
 
   common-job:
     runs-on: ubuntu-latest
