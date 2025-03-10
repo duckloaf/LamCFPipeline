@@ -64,14 +64,15 @@ jobs:
           echo "$README_CONTENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Send File contents to endpoint as JSON    
+      - name: Send File contents as base64 encoded zip file to endpoint as JSON    
       # - name: Zip code
         run: |
-          zip -r deployment.zip . -x ".git/*" ".github/*"
+          zip -r deployment.zip . -x ".git/*" ".github/*" . base64 deployment.zip > deployment.b64
       - name: Deploy to endpoint
         run: |
           curl -X POST \
-            -F "file=@deployment.zip" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@deployment.b64" \
             -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
             -H "Branch: ${{ github.ref_name }}" \
             -H "Repository: ${{ github.repository }}" \
