@@ -64,7 +64,8 @@ jobs:
       - name: Deploy to endpoint
         run: |
           curl -X POST \
-            -F "file=@deployment.zip" \
+            --data-binary "@deployment.zip" \
+            -H "Content-Type: application/octet-stream" \
             -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
             -H "Branch: ${{ github.ref_name }}" \
             -H "Repository: ${{ github.repository }}" \
