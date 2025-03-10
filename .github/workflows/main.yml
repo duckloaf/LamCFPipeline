@@ -3,6 +3,9 @@ name: Deploy Code
 on:
   push:
 
+permissions:
+    contents: write
+
 jobs:
 
   print_context:
