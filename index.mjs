@@ -1,7 +1,7 @@
 export const handler = async (event) => {
     const response = {
         statusCode: 200,
-        message: 'This is an update on the develop branch for UAT - full cicd 2g'
+        message: 'This is an update on the develop branch for UAT - full cicd 2h'
     };
     return response;
 };
