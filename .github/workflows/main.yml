@@ -67,7 +67,7 @@ jobs:
       - name: Send File contents as base64 encoded zip file to endpoint as JSON    
       # - name: Zip code
         run: |
-          zip -r deployment.zip . -x ".git/*" ".github/*" . base64 deployment.zip > deployment.b64
+          zip -r deployment.zip -x ".git/*" ".github/*" . base64 deployment.zip > deployment.b64
       - name: Deploy to endpoint
         run: |
           curl -X POST \
