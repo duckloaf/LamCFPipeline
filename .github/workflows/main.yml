@@ -52,24 +52,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Zip code
+      - name: Read Index file content
+        id: read_index
         run: |
-           zip -r deployment.zip . -x ".git/*" ".github/*" "*.zip"
-
-      - name: Commit and push zip file
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-            commit_message: "Add deployment.zip"
-            file_pattern: deployment.zip
+          INDEX_CONTENT=$(cat index.mjs)
+          echo "index_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$INDEX_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Deploy to endpoint
         run: |
           curl -X POST \
-            --data-binary "@deployment.zip" \
-            -H "Content-Type: application/octet-stream" \
+            -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
             -H "Branch: ${{ github.ref_name }}" \
             -H "Repository: ${{ github.repository }}" \
+            -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\"}"
             https://jsf58ekjw3.execute-api.us-west-2.amazonaws.com/prod/deploy
           if [ $? -ne 0 ]; then
             echo "Deployment failed!"
