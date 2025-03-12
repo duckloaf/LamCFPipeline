@@ -67,7 +67,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
             -H "Branch: ${{ github.ref_name }}" \
             -H "Repository: ${{ github.repository }}" \
-            -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\"}"
+            -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\"}" \
             https://jsf58ekjw3.execute-api.us-west-2.amazonaws.com/prod/deploy
           if [ $? -ne 0 ]; then
             echo "Deployment failed!"
