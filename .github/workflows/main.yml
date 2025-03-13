@@ -52,27 +52,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Read Index file content
-        id: read_index
+      - name: Create Zip File
         run: |
-          INDEX_CONTENT=$(cat index.mjs)
-          echo "index_content<<EOF" >> $GITHUB_OUTPUT
-          echo "$INDEX_CONTENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Deploy to endpoint
+          zip -r deployment.zip . -x ".git/*" ".github/*" "*.zip"
+      - name: Upload ZIP to API Gateway
         run: |
           curl -X POST \
-            -H "Content-Type: application/json" \
+            -H "Content-Type: application/zip" \
             -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
             -H "Branch: ${{ github.ref_name }}" \
             -H "Repository: ${{ github.repository }}" \
-            -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\"}" \
+            --data-binary "@deployment.zip" \
             https://jsf58ekjw3.execute-api.us-west-2.amazonaws.com/prod/deploy
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed!"
-            exit 1
-          fi
+
+    #   - name: Read Index file content
+    #     id: read_index
+    #     run: |
+    #       INDEX_CONTENT=$(cat index.mjs)
+    #       echo "index_content<<EOF" >> $GITHUB_OUTPUT
+    #       echo "$INDEX_CONTENT" >> $GITHUB_OUTPUT
+    #       echo "EOF" >> $GITHUB_OUTPUT
+
+    #   - name: Deploy to endpoint
+    #     run: |
+    #       curl -X POST \
+    #         -H "Content-Type: application/json" \
+    #         -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+    #         -H "Branch: ${{ github.ref_name }}" \
+    #         -H "Repository: ${{ github.repository }}" \
+    #         -d "{\"indexContent\": \"${{ steps.read_index.outputs.index_content }}\"}" \
+    #         https://jsf58ekjw3.execute-api.us-west-2.amazonaws.com/prod/deploy
+    #       if [ $? -ne 0 ]; then
+    #         echo "Deployment failed!"
+    #         exit 1
+    #       fi
 
   common-job:
     runs-on: ubuntu-latest
